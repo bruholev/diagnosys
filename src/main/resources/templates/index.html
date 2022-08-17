@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<body>
+<table>
+    <tr>
+        <th scope="col">Напишите свой возраст пол и что вас беспокоит</th>
+    </tr>
+    <tr>
+        <form method="get" th:action="@{/diagnosys}">
+
+            <td>
+                <input hidden name="initial" th:value="initial">
+                <label>Возраст</label>
+                <input type="text" name="age" >
+            </td>
+            <td>
+                <label>Пол</label>
+                <input type="text" name="sex" >
+            </td>
+            <td>
+                <label>Симптом</label>
+                <input type="text" name="symptom" >
+            </td>
+            <td>
+                <button type="submit" >Кнопка</button>
+            </td>
+        </form>
+    </tr>
+
+
+
+
+    </tr>
+</table>
+</body>
+</html>

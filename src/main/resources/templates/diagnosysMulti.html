@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<body>
+<table>
+    <tr>
+        <th scope="col">Вопрос</th>
+        <th scope="col">Да/Нет </th>
+        <td th:utext="${text}"></td>
+    </tr>
+    <tr>
+
+            <form method="get" th:action="@{/diagnosys}">
+
+            <tr th:each="record:${list}">
+
+                <input hidden name="initial" th:value="no">
+                <input hidden name="token" th:value="${tokenId}">
+               <input hidden name="token" th:value="${record.name}">
+                <input type="checkbox" name="yes" >
+            </tr>
+            <td>
+            <button type="submit" >Кнопка</button>
+            </td>
+
+
+            </form>
+
+
+    </tr>
+</table>
+</body>
+</html>

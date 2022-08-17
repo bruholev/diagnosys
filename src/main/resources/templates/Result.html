@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Handing Form Submission</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+<h1> Сравнительный анализ</h1>
+
+<table style="width:100%">
+    <tr>
+        <td>Откуда</td>
+        <td>Euro</td>
+        <td>GBP</td>
+        <td>CZK</td>
+        <td>CHF</td>
+        <td>TRY</td>
+    </tr>
+    <tr>
+        <td><p th:text="'Из России'" /></td>
+        <td><p th:text="${ruEur}" /></td>
+        <td><p th:text="${ruGbp}" /></td>
+        <td><p th:text="${ruCzk}" /></td>
+        <td><p th:text="${ruChf}" /></td>
+        <td><p th:text=" ${ruTry}" /></td>
+    <tr>
+        <td><p th:text="'Из Кыргызстана'" /></td>
+        <td><p th:text="${kgEur}" /></td>
+        <td><p th:text="${kgGbp}" /></td>
+        <td><p th:text="${kgCzk}" /></td>
+        <td><p th:text="${kgChf}" /></td>
+        <td><p th:text="${kgTry}" /></td>
+    </tr>
+    <tr>
+        <td><p th:text="'Из Евпропы'" /></td>
+        <td><p th:text="${euEur}" /></td>
+        <td><p th:text="${euGbp}" /></td>
+        <td><p th:text="${euCzk}" /></td>
+        <td><p th:text="${euChf}" /></td>
+        <td><p th:text="${euTry}" /></td>
+    </tr>
+    <tr>
+        <td><p th:text="'Из Узбекистана'" /></td>
+        <td><p th:text="${uzEur}" /></td>
+        <td><p th:text="${uzGbp}" /></td>
+        <td><p th:text="${uzCzk}" /></td>
+        <td><p th:text="${uzChf}" /></td>
+        <td><p th:text="${uzTry}" /></td>
+    </tr>
+    <tr>
+        <td><p th:text="'Минимальный курс сома--'+${minSom}" /></td>
+        <td><p th:text="'Максимальный курс сома--'+${maxSom}" /></td>
+    </tr>
+</table>
+</body>
+</html>
