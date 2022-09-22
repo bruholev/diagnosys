@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<body>
+<table>
+
+
+    <tr th:each="record:${list}">
+        <td th:utext="${record.id}"></td>
+        <td th:utext="${record.name}"></td>
+        <td th:utext="${record.common_name}"></td>
+        <td th:utext="${record.probability}"></td>
+
+
+    </tr>
+
+
+</table>
+</body>
+</html>

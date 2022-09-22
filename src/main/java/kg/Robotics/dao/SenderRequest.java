@@ -1,5 +1,5 @@
 package kg.Robotics.dao;
 
 public interface SenderRequest {
-    public Object sendRequest(RequestDyagnosys requestDyagnosys);
+    public Object sendRequest(Object requestDyagnosys);
 }

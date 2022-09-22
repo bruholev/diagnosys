@@ -11,32 +11,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 
 @Controller
 public class TaskController {
     private static final Logger log= LoggerFactory.getLogger(TaskController.class);
-
-@Autowired
+    ExecutorService service= Executors.newCachedThreadPool();
+    @Autowired
     EvidenceRepository evidenceRepository;
 
     @Autowired
     TaskService taskService;
-    //  отправляем запрос
-  /*  @GetMapping("/{id}")
-    public String shoot(@PathVariable("id") String id, Model model) {
-        String action="";
-        InterfaceAct interfaceAct=id.equals("shoot")?new Shoot():
-                id.equals("shootAllOne")?new ShootAllOne():
-                id.equals("monitorsilence")?new Monitorsilence():
-                id.equals("monitorShoot")? new MonitorShoot(): (InterfaceAct) new Object();
-        action=taskService.ServiceActions(interfaceAct);
-       model.addAttribute("record",action);
-        return "Shoot";
-    }*/
+
 
     @GetMapping("/")
     public String begin(){        return "index";}
@@ -57,60 +47,82 @@ public class TaskController {
     }
 
     @GetMapping("/diagnosys")
-    public String sendRequest(@RequestParam(value = "yes",required = false)String yes,
+    public String sendRequest(@RequestParam(value = "checkbox",required = false) String checkbox,
                               @RequestParam(value = "token",required = false)String token,
                               @RequestParam(value = "initial",required = false)String initial,
                               @RequestParam(value = "sex",required = false)String sex,
                               @RequestParam(value = "age",required = false)String age,
-                              @RequestParam(value = "symptom",required = false)String symptom,Model model){
-        String page="diagnosys";
-        List<Symptom> list=new ArrayList<>();
-        List<Evidence> listEv=new ArrayList<>();
-        RequestDyagnosys requestDyagnosys= new RequestDyagnosys();
+                              @RequestParam(value = "symptom",required = false)List<String >symptom,
+                              Model model) throws ExecutionException, InterruptedException, TimeoutException {
+        Callable<String> callableTask = () -> {
+            String page="diagnosys";
+            String  tokenInit="";
+            RequestParse requestParse=new RequestParse();
+            List<Symptom> list=new ArrayList<>();
+            List<Evidence> listEv=new ArrayList<>();
+            List<Condition> conditionList= new ArrayList<>();
+            RequestDyagnosys requestDyagnosys= new RequestDyagnosys();
 
-        if(initial.equals("initial")){
-            requestDyagnosys.setAge(new Age(age));
-            requestDyagnosys.setSex(sex);
-            list.add(new Symptom(symptom,"present",initial));
-            requestDyagnosys.setEvidence(list);
-        }
-      else if(!token.equals("")){
-            listEv=evidenceRepository.findAllByToken(token);
-            age=listEv.get(0).getAge();
-            sex=listEv.get(0).getSex();
-            listEv.stream().forEach(e->list.add(new Symptom(e.getIdText(),e.getChoiceId())));
-            log.info("token "+token);
-            log.info("initial "+initial);
-            log.info("sex "+sex);
-            log.info("age "+age);
-            log.info("symptom "+symptom);
-            requestDyagnosys.setAge(new Age(age));
-            requestDyagnosys.setSex(sex);
-            requestDyagnosys.setEvidence(list);
-        }
-         RequestResponseDyagnosys  responseDyagnosys= (RequestResponseDyagnosys) taskService.requestDiagnosys(new Diagnosys(),requestDyagnosys);
-         Question question=responseDyagnosys.getResponseDyagnosys().getQuestion();
-        model.addAttribute("text",question.getText());
-        log.info("type"+question.getType());
-        if(question.getType().equals("single")){
-            model.addAttribute("name",question.getItems().get(0).getName());
-        }
-        else{
+            if(initial.equals("initial")){
+                tokenInit="tokenDiagnosys"+ new Date();
+                requestParse.setAge(new Age(age));
+                requestParse.setText(symptom.get(0));
+                ResponseParse requestResponseParse=( ResponseParse) taskService
+                        .request (new Parse(),requestParse);
 
-            model.addAttribute("list",question.getItems().stream().collect(Collectors.toList()));
-            page="diagnosysMulti";
-        }
-        log.info("tokenIn"+responseDyagnosys.getResponseDyagnosys().getInterview_token());
+                List <Mention> listSymptom =requestResponseParse.getMentions();
+                listSymptom.stream().forEach(e-> list.add(new Symptom(e.getId(),"present",initial)));
+
+                requestDyagnosys.setAge(new Age(age));
+                requestDyagnosys.setSex(sex);
+                requestDyagnosys.setEvidence(list);
+                evidenceRepository.save(new Evidence(listSymptom.get(0).getId(),
+                        "present", tokenInit,sex,age));
+            }
+            else {
+
+                symptom.stream().forEach(e->evidenceRepository.save(new Evidence(e,
+                        e.equals(checkbox)?"present":"absent",token,sex,age)));
+                listEv= evidenceRepository.findAllByToken(token);
+
+                for (Evidence evidence:listEv) {
+                    list.add(new Symptom(evidence.getIdText(),   evidence.getChoiceId()));
+                    requestDyagnosys.setAge(new Age(evidence.getAge()));
+                    requestDyagnosys.setSex(evidence.getSex());
+                }
 
 
-model.addAttribute("tokenId",responseDyagnosys.getResponseDyagnosys().getInterview_token());
-    for(Symptom symptoml:list){
-        evidenceRepository.save(new Evidence(symptoml.getId(),symptoml.getChoice_id()
-                ,responseDyagnosys.getResponseDyagnosys().getInterview_token()
-                ,sex,age));
-    }
-    evidenceRepository.findAll().stream().forEach(e->log.info("list evid"+e.getIdText()));
-        return page;
+                requestDyagnosys.setEvidence(list);
+            }
+            log.info("requestDyagnosys getSex "+requestDyagnosys.getSex());
+            log.info("requestDyagnosys getSex "+requestDyagnosys.getAge().getValue());
+            requestDyagnosys.getEvidence().stream().forEach(e->log.info("requestDyagnosys getEvidence "+e.getId()+
+                    " getChoice_id "+ e.getChoice_id()+" getSource "+e.getSource()));
+            ResponseDyagnosys  responseDyagnosys= (ResponseDyagnosys) taskService.request (new Diagnosys(),requestDyagnosys);
+            if(responseDyagnosys.getQuestion()!=null) {
+                Question question = responseDyagnosys.getQuestion();
+                List<Item> listItem = new ArrayList<>();
+                model.addAttribute("text", question.getText());
+                if (question.getType().equals("single")) {
+                    model.addAttribute("name", question.getItems().get(0).getName());
+                    model.addAttribute("id", question.getItems().get(0).getId());
+                    page = "diagnosys";
+                } else {
+                    listItem = question.getItems().stream().collect(Collectors.toList());
+                    model.addAttribute("list", listItem);
+                    page = "diagnosysMulti";
+                }
+                model.addAttribute("tokenId", initial.equals("initial")?tokenInit:token);
+                model.addAttribute("sexMem", requestDyagnosys.getSex());
+                model.addAttribute("ageMem", requestDyagnosys.getAge().getValue());
+            }else if(responseDyagnosys.getQuestion()==null){
+                conditionList= responseDyagnosys.getConditions().stream().collect(Collectors.toList());
+                model.addAttribute("list", conditionList);
+                page="results";
+            }
+            return page ;   };
+        String pageString= service.submit(callableTask).get(10000, TimeUnit.MILLISECONDS);
+        return pageString;
     }
 
 

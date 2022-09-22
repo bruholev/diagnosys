@@ -23,6 +23,11 @@ public class Item {
         this.choices = choices;
     }
 
+    public Item(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public String getId() {
         return id;
     }

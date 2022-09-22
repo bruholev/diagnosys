@@ -16,7 +16,7 @@ public class TaskService {
     public String ServiceActions(InterfaceAct interfaceAct){return new Dron().action(interfaceAct);  }
 
 
-    public Object  requestDiagnosys(SenderRequest senderRequest,RequestDyagnosys requestDyagnosys){
+    public Object  request (SenderRequest senderRequest,Object requestDyagnosys){
 
         return senderRequest.sendRequest(requestDyagnosys);
     }

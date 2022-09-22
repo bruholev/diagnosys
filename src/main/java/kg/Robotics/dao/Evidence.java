@@ -14,6 +14,13 @@ public class Evidence {
     private String sex;
     private String age;
 
+    public Evidence(String idText, String token, String sex, String age) {
+        this.idText = idText;
+        this.token = token;
+        this.sex = sex;
+        this.age = age;
+    }
+
     public Evidence(String idText, String choiceId, String token, String sex, String age) {
         this.idText = idText;
         this.choiceId = choiceId;

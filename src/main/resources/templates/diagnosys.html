@@ -6,14 +6,19 @@
     <tr>
     <th scope="col">Вопрос</th>
     <th scope="col">Да/Нет </th>
+    <td th:utext="${text}"></td>
     </tr>
     <tr>
         <form method="get" th:action="@{/diagnosys}">
-            <td th:utext="${text}"></td>
+
             <td>
                 <input hidden name="initial" th:value="no">
+                <input hidden name="sex" th:value="${sexMem}">
+                <input hidden name="age" th:value="${ageMem}">
                 <input hidden name="token" th:value="${tokenId}">
-                <input type="checkbox" name="yes" >
+                <input hidden name="symptom" th:value="${id}">
+                <td th:utext="${name}"></td>
+            <td> <input type="checkbox" name="checkbox"  th:value="${id}" ></td>
             </td>
 
             <td>

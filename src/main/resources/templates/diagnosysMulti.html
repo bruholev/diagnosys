@@ -11,13 +11,16 @@
     <tr>
 
             <form method="get" th:action="@{/diagnosys}">
-
-            <tr th:each="record:${list}">
-
-                <input hidden name="initial" th:value="no">
                 <input hidden name="token" th:value="${tokenId}">
-               <input hidden name="token" th:value="${record.name}">
-                <input type="checkbox" name="yes" >
+                <input hidden name="sex" th:value="${sexMem}">
+                <input hidden name="age" th:value="${ageMem}">
+                <input hidden name="initial" th:value="no">
+            <tr th:each="record:${list}">
+              <td th:utext="${record.name}"></td>
+             <td> <input type="checkbox" name="checkbox"  th:value="${record.id}"></td>
+               <input hidden name="symptom" th:value="${record.id}">
+
+
             </tr>
             <td>
             <button type="submit" >Кнопка</button>
